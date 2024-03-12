@@ -2,7 +2,9 @@ package com.model2.mvc.web.product;
 
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +47,10 @@ public class ProductController
 	int pageSize;
 	
 	@RequestMapping("/getProduct.do")
-	public ModelAndView getProduct(@RequestParam("prodNo") int prodNo,@RequestParam("menu") String menu) throws Exception 
+	public ModelAndView getProduct(@RequestParam("prodNo") int prodNo,
+								   @RequestParam("menu") String menu, 
+								   HttpServletResponse response,
+								   HttpServletRequest request) throws Exception 
 	{
 		System.out.println("/getProduct.do");
 		
@@ -60,9 +65,36 @@ public class ProductController
 			modelAndView.setViewName("forward:/product/updateProductView.jsp");
 		}else
 		{
+			Cookie[] cookies 	= request.getCookies();
+			String history 		= "";
+			if(cookies != null)
+			{
+				for(Cookie cookie : cookies)
+				{
+					if(cookie.getName().equals("history"))
+					{
+						// 쿠키 있으면 추가
+						history 	= cookie.getValue();
+						history += ":" + prodNo;
+						cookie 	= new Cookie("history", history);
+						response.addCookie(cookie);
+						break;
+					}else
+					{
+						// 쿠키가 없으면 새로 생성
+						cookie = new Cookie("history", Integer.toString(prodNo));
+						response.addCookie(cookie);
+					}
+				}
+			}else
+			{
+				// 쿠키가 없으면 새로 생성
+				Cookie cookie = new Cookie("history", Integer.toString(prodNo));
+				response.addCookie(cookie);
+			}
+			
 			modelAndView.setViewName("forward:/product/getProductView.jsp");
 		}
-		
 		
 		return modelAndView;
 	}
@@ -116,12 +148,13 @@ public class ProductController
 		System.out.println("검색어 : " + search.getSearchCondition() );
 		
 		search.setPageSize(pageSize);
+		
 		// Business logic 수행
 		Map<String , Object> map = productService.getProductList(search);
 		
 		Page resultPage = new Page( search.getCurrentPage(), ((Integer)map.get("totalCount")).intValue(), pageUnit, pageSize);
 		System.out.println(resultPage);
-				
+		
 		int totalCount  = productService.getProductTotal(search);
 		
 		// Model 과 View 연결

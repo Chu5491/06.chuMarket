@@ -106,7 +106,7 @@
 						</tr>
 					</c:forEach>
 					<tr>
-						<td colspan="11" bgcolor="D6D7D6" height="1"></td>
+						<td colspan="13" bgcolor="D6D7D6" height="1"></td>
 					</tr>
 				</table>
 				<!--  페이지 Navigator 시작 -->

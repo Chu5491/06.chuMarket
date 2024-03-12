@@ -201,7 +201,7 @@ function submitForm(flag)
 				<td width="104" class="ct_write">구매수량</td>
 				<td bgcolor="D6D6D6" width="1"></td>
 				<td width="200" class="ct_write01">
-					${buyCount}
+					${pur.tranStock}
 				</td>
 			</tr>
 		</table>

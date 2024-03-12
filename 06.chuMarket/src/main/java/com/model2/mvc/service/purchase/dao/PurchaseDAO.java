@@ -48,6 +48,12 @@ public class PurchaseDAO implements com.model2.mvc.service.purchase.PurchaseDAO
 				
 		return sqlSession.selectList("PurchaseMapper.getPurchaseList", args);
 	}
+	
+	public List<Purchase> getSaleList(int prodNo) throws Exception 
+	{
+		
+		return sqlSession.selectList("PurchaseMapper.getSaleList",prodNo);
+	}
 
 	public int getPurchaseTotal(String userId) throws Exception 
 	{
@@ -66,6 +72,15 @@ public class PurchaseDAO implements com.model2.mvc.service.purchase.PurchaseDAO
 		args.put("buyCount", buyCount);
 		
 		sqlSession.update("PurchaseMapper.decreaseStock", args);
+	}
+	
+	public void increaseStock(Purchase pur, int buyCount) throws Exception 
+	{
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("pur", pur );
+		args.put("buyCount", buyCount);
+		
+		sqlSession.update("PurchaseMapper.increaseStock", args);
 	}
 	
 	public void updateTranCode(Purchase pur) throws Exception 

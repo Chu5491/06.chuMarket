@@ -11,7 +11,7 @@
 		<result property="purchaseProd.prodNo" 	 column="PROD_NO" 			jdbcType="INTEGER"/>
 		<result property="buyer.userId" 	 	 column="BUYER_ID" 			jdbcType="VARCHAR"/>
 		<result property="paymentOption" 	 	 column="PAYMENT_OPTION" 	jdbcType="VARCHAR" />
-		<result property="receiverName"  	 	 column="RECEIVER_PHONE" 	jdbcType="VARCHAR" />
+		<result property="receiverName"  	 	 column="RECEIVER_NAME" 	jdbcType="VARCHAR" />
 		<result property="receiverPhone" 	 	 column="RECEIVER_PHONE" 	jdbcType="VARCHAR" />
 		<result property="divyAddr" 	 	 	 column="DEMAILADDR" 		jdbcType="VARCHAR" />
 		<result property="divyRequest" 	 	 	 column="DLVY_REQUEST" 		jdbcType="VARCHAR" />
@@ -30,7 +30,7 @@
 	</resultMap>
   	
 	<!-- INSERT 매핑구문 (insert SQL 등록) :: insert element -->
-  	<insert id="addPurchase" parameterType="pur" useGeneratedKeys="true" keyProperty="tranNo" keyColumn="TRAN_NO">
+  	<insert id="addPurchase" parameterType="pur" useGeneratedKeys="true" keyProperty="tranNo,orderDate" keyColumn="TRAN_NO,ORDER_DATA">
 		INSERT INTO 
 		TRANSACTION 
 		VALUES (
@@ -59,7 +59,7 @@
   			BUYER_ID,
   			PAYMENT_OPTION,
   			RECEIVER_NAME,
-  			RECEIVER_PHONE
+  			RECEIVER_PHONE,
 			DEMAILADDR,
 			DLVY_REQUEST,
 			TRAN_STATUS_CODE,
@@ -103,11 +103,21 @@
 				PROD_NO = #{pur.purchaseProd.prodNo}
 			</where>
   	</update>
+  	
+  	<update id="increaseStock" parameterType="map">
+  		UPDATE PRODUCT 
+  			<set>
+	  			PROD_STOCK = #{pur.purchaseProd.prodStock} + #{buyCount}
+  			</set>
+			<where>
+				PROD_NO = #{pur.purchaseProd.prodNo}
+			</where>
+  	</update>
   	<!-- UPDATE 매핑구문 (update SQL 등록) :: update element -->
   	
   	
   	<!-- UPDATE 매핑구문 (update SQL 등록) :: update element -->  	
-  	<update id="updateTranCode" parameterType="pur">
+  	<update id="updateTranCode" parameterType="map">
   		UPDATE TRANSACTION 
   			<set>
 	  			<if test="tranCode != null">TRAN_STATUS_CODE = #{tranCode}</if>
@@ -144,6 +154,15 @@
   	</select>
 	<!-- SELECT 매핑구문 (select SQL 등록) :: select element -->  
 	
+	<!-- SELECT 매핑구문 (select SQL 등록) :: select element -->  	
+  	<select id="getSaleList" parameterType="int" resultMap="purchaseSelectMap">
+  		SELECT 
+			*
+		FROM 
+		TRANSACTION
+		WHERE PROD_NO = #{value}
+  	</select>
+	<!-- SELECT 매핑구문 (select SQL 등록) :: select element -->  
 	
 	<!-- SQL : SELECT ROW Count -->	 
 	<select  id="getPurchaseTotal"  parameterType="string" resultType="int">

@@ -74,7 +74,7 @@
 								<td align="left">
 									<c:if test="${pur.tranCode == '1'}">
 										판매완료
-										<a href="/updateTranCode.do?tranNo=${pur.tranNo}&tranCode=${pur.tranCode}&menu=sale">
+										<a href="/updateTranCode.do?tranNo=${pur.tranNo}&menu=sale">
 								  			배송하기
 								  		</a>
 									</c:if>

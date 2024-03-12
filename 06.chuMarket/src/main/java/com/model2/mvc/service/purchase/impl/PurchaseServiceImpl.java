@@ -1,5 +1,6 @@
 package com.model2.mvc.service.purchase.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Service;
 import com.model2.mvc.common.Search;
 import com.model2.mvc.service.purchase.PurchaseService;
 import com.model2.mvc.service.purchase.dao.PurchaseDAO;
+import com.model2.mvc.service.user.UserDAO;
 import com.model2.mvc.service.domain.Purchase;
+import com.model2.mvc.service.product.ProductDAO;
 
 @Service("purchaseServiceImpl")
 public class PurchaseServiceImpl implements PurchaseService
@@ -20,6 +23,14 @@ public class PurchaseServiceImpl implements PurchaseService
 	@Autowired
 	@Qualifier("purDAO")
 	private PurchaseDAO purDAO;
+	
+	@Autowired
+	@Qualifier("prodDAO")
+	private ProductDAO prodDAO;
+		
+	@Autowired
+	@Qualifier("userDAO")
+	private UserDAO userDAO;
 	
 	///»ý¼ºÀÚ
 	public PurchaseServiceImpl()
@@ -43,11 +54,20 @@ public class PurchaseServiceImpl implements PurchaseService
 	
 	public Map<String,Object> getPurchaseList(Search search, String userId) throws Exception
 	{
-		List<Purchase> list= purDAO.getPurchaseList(search,userId);
+		List<Purchase> list = purDAO.getPurchaseList(search,userId);
+		List<Purchase> result = new ArrayList<Purchase>();
 		int totalCount = purDAO.getPurchaseTotal(userId);
 		
+		for(Purchase value : list)
+		{
+			value.setBuyer(userDAO.getUser(value.getBuyer().getUserId()));
+			value.setPurchaseProd(prodDAO.getProduct(value.getPurchaseProd().getProdNo()));
+			value.setTranCode(value.getTranCode().trim());
+			result.add(value);
+		}
+		
 		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("list", list );
+		map.put("list", result );
 		map.put("totalCount", new Integer(totalCount));
 		
 		return map;
@@ -59,9 +79,23 @@ public class PurchaseServiceImpl implements PurchaseService
 		return totalCount;
 	}
 	
-	public Map<String,Object> getSaleList(Search search) throws Exception
+	public Map<String,Object> getSaleList(int prodNo) throws Exception
 	{
-		return null;
+		List<Purchase> list = purDAO.getSaleList(prodNo);
+		List<Purchase> result = new ArrayList<Purchase>();
+		
+		for(Purchase value : list)
+		{
+			value.setBuyer(userDAO.getUser(value.getBuyer().getUserId()));
+			value.setPurchaseProd(prodDAO.getProduct(value.getPurchaseProd().getProdNo()));
+			value.setTranCode(value.getTranCode().trim());
+			result.add(value);
+		}
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		map.put("list", result );
+		
+		return map;
 	}
 	
 	public void updatePurchase(Purchase pur) throws Exception
@@ -80,9 +114,8 @@ public class PurchaseServiceImpl implements PurchaseService
 		purDAO.decreaseStock(pur,buyCount);
 	}
 
-	@Override
-	public Map<String, Object> getPurchaseProdList(int prodNo) throws Exception 
+	public void increaseStock(Purchase pur, int buyCount) throws Exception 
 	{
-		return null;
+		purDAO.increaseStock(pur,buyCount);
 	}
 }

@@ -15,7 +15,7 @@ public Purchase addPurchase(Purchase pur) throws Exception;
 	
 	public int getPurchaseTotal(String userId) throws Exception;
 	
-	public Map<String,Object> getSaleList(Search searchVO) throws Exception;
+	public Map<String,Object> getSaleList(int prodNo) throws Exception;
 	
 	public void updatePurchase(Purchase pur) throws Exception;
 	
@@ -23,6 +23,7 @@ public Purchase addPurchase(Purchase pur) throws Exception;
 	
 	public void decreaseStock(Purchase pur, int buyCount) throws Exception;
 	
-	public Map<String,Object> getPurchaseProdList(int prodNo) throws Exception; 
+	public void increaseStock(Purchase pur, int buyCount) throws Exception;
+
 }
 
